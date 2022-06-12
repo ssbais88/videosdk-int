@@ -11,6 +11,22 @@ import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { JoiningScreen } from "./components/JoiningScreen";
 import ReactPlayer from "react-player";
+import {
+  BottomNavigation,
+  BottomNavigationAction,
+  Box,
+  Button,
+  CssBaseline,
+  Paper,
+  Typography,
+  useTheme,
+} from "@material-ui/core";
+import MicIcon from "@material-ui/icons/Mic";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import ScreenShareIcon from "@material-ui/icons/ScreenShare";
+import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
+import StopIcon from "@material-ui/icons/Stop";
+import CallEndIcon from "@material-ui/icons/CallEnd";
 
 const primary = "#3E84F6";
 
@@ -151,15 +167,17 @@ const MeetingChat = ({ tollbarHeight }) => {
     <div
       style={{
         marginLeft: borderRadius,
-        width: 400,
-        backgroundColor: primary,
+        width: 300,
+        backgroundColor: "#706694",
         overflowY: "scroll",
         borderRadius,
         height: `calc(100vh - ${tollbarHeight + 2 * borderRadius}px)`,
         padding: borderRadius,
       }}
     >
-      <Title title={"Chat"} />
+      <Typography variant="h5" style={{ marginBottom: "15px" }}>
+        Chat
+      </Typography>
 
       <div style={{ display: "flex" }}>
         <input
@@ -168,9 +186,17 @@ const MeetingChat = ({ tollbarHeight }) => {
             const v = e.target.value;
             setMessage(v);
           }}
+          style={{ borderRadius: "5px", width: "300px" }}
+          placeholder="Type your message here"
         />
-        <button
-          className={"button default"}
+        <Button
+          style={{
+            marginLeft: "25px",
+            marginRight: 0,
+            textAlign: "right",
+          }}
+          color="primary"
+          variant="contained"
           onClick={() => {
             const m = message;
 
@@ -181,7 +207,7 @@ const MeetingChat = ({ tollbarHeight }) => {
           }}
         >
           Send
-        </button>
+        </Button>
       </div>
       <MessageList messages={messages} />
     </div>
@@ -193,8 +219,8 @@ const ParticipantView = ({ participantId }) => {
   const micRef = useRef(null);
   const screenShareRef = useRef(null);
 
-  const onStreamEnabled = (stream) => { };
-  const onStreamDisabled = (stream) => { };
+  const onStreamEnabled = (stream) => {};
+  const onStreamDisabled = (stream) => {};
 
   const {
     displayName,
@@ -247,9 +273,7 @@ const ParticipantView = ({ participantId }) => {
         micRef.current.srcObject = mediaStream;
         micRef.current
           .play()
-          .catch((error) =>
-            console.error("mic  play() failed", error)
-          );
+          .catch((error) => console.error("mic  play() failed", error));
       } else {
         micRef.current.srcObject = null;
       }
@@ -280,7 +304,7 @@ const ParticipantView = ({ participantId }) => {
           overflow: "hidden",
           backgroundColor: "black",
           width: "100%",
-          height: 300,
+          height: "500px",
         }}
       >
         <div
@@ -334,36 +358,7 @@ const ParticipantView = ({ participantId }) => {
               left: 10,
             }}
           >
-            <button
-              className="button blue"
-              style={
-                {
-                  // height: 50,
-                  // width: 200,
-                }
-              }
-              onClick={async () => {
-                const meetingId = prompt(
-                  `Please enter meeting id where you want to switch ${displayName}`
-                );
-                const token = await getToken();
-                if (meetingId && token) {
-                  try {
-                    await switchTo({
-                      meetingId,
-                      payload: "Im Switching",
-                      token: token,
-                    });
-                  } catch (e) {
-                    console.log("swithc To Error", e);
-                  }
-                } else {
-                  alert("Empty meetingId!");
-                }
-              }}
-            >
-              Switch Participant
-            </button>
+            <Typography>{displayName}</Typography>
           </div>
         </div>
       </div>
@@ -376,7 +371,7 @@ const ParticipantView = ({ participantId }) => {
           overflow: "hidden",
           backgroundColor: "black",
           width: "100%",
-          height: 300,
+          height: "100%",
         }}
       >
         <div
@@ -424,26 +419,6 @@ const ParticipantView = ({ participantId }) => {
           </div>
         </div>
       </div>
-      <table>
-        {[
-          { k: "Name", v: displayName },
-          { k: "webcamOn", v: webcamOn ? "YES" : "NO" },
-          { k: "micOn", v: micOn ? "YES" : "NO" },
-          { k: "screenShareOn", v: screenShareOn ? "YES" : "NO" },
-          { k: "isLocal", v: isLocal ? "YES" : "NO" },
-          { k: "isActiveSpeaker", v: isActiveSpeaker ? "YES" : "NO" },
-          { k: "isMainParticipant", v: isMainParticipant ? "YES" : "NO" },
-        ].map(({ k, v }) => (
-          <tr key={k}>
-            <td style={{ border: "1px solid #fff", padding: 4 }}>
-              <h3 style={{ margin: 0, padding: 0, color: "#fff" }}>{k}</h3>
-            </td>
-            <td style={{ border: "1px solid #fff", padding: 4 }}>
-              <h3 style={{ margin: 0, padding: 0, color: "#fff" }}>{v}</h3>
-            </td>
-          </tr>
-        ))}
-      </table>
     </div>
   );
 };
@@ -674,7 +649,7 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
         },
         {
           label: "No",
-          onClick: () => { },
+          onClick: () => {},
         },
       ],
     });
@@ -757,149 +732,106 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
     onSwitchMeeting,
     onConnectionOpen,
   });
+  const [value, setValue] = React.useState(0);
+  const theme = useTheme();
 
-  const handlestartVideo = () => {
-    console.log("handlestartVideo");
-
-    startVideo({
-      link: "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
-    });
-  };
-  const handlestopVideo = () => {
-    stopVideo();
-  };
-  const handleresumeVideo = () => {
-    resumeVideo();
-  };
-  const handlepauseVideo = () => {
-    pauseVideo({ currentTime: 2 });
-  };
-  const handlesseekVideo = () => {
-    seekVideo({ currentTime: 5 });
-  };
-  const handleStartLiveStream = () => {
-    startLivestream([
-      {
-        url: "rtmp://a.rtmp.youtube.com/live2",
-        streamKey: "key",
-      },
-    ]);
-  };
-  const handleStopLiveStream = () => {
-    stopLivestream();
-  };
   const handleStartRecording = () => {
     startRecording();
   };
   const handleStopRecording = () => {
     stopRecording();
   };
+  const confirmLeave = () => {
+    leave();
+  };
 
   const tollbarHeight = 120;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "#D6E9FE",
-      }}
-    >
-      <div style={{ height: tollbarHeight }}>
-        <button className={"button red"} onClick={leave}>
-          LEAVE
-        </button>
-        <button className={"button blue"} onClick={toggleMic}>
-          toggleMic
-        </button>
-        <button
-          className={"button blue"}
-          onClick={() => {
-            toggleWebcam();
-          }}
-        >
-          toggleWebcam
-        </button>
-        <button className={"button blue"} onClick={toggleScreenShare}>
-          toggleScreenShare
-        </button>
-        <button className={"button blue"} onClick={handlestartVideo}>
-          startVideo
-        </button>
-        <button className={"button blue"} onClick={handlestopVideo}>
-          stopVideo
-        </button>
-        <button className={"button blue"} onClick={handleresumeVideo}>
-          resumeVideo
-        </button>
-        <button className={"button blue"} onClick={handlepauseVideo}>
-          pauseVideo
-        </button>
-        <button className={"button blue"} onClick={handlesseekVideo}>
-          seekVideo
-        </button>
-        <button className={"button blue"} onClick={handleStartLiveStream}>
-          Start Live Stream
-        </button>
-        <button className={"button blue"} onClick={handleStopLiveStream}>
-          Stop Live Stream
-        </button>
-        <button className={"button blue"} onClick={handleStartRecording}>
-          start recording
-        </button>
-        <button className={"button blue"} onClick={handleStopRecording}>
-          stop recording
-        </button>
-        <button
-          className={"button blue"}
-          onClick={() => setParticipantViewVisible((s) => !s)}
-        >
-          Switch to {participantViewVisible ? "Connections" : "Participants"}{" "}
-          view
-        </button>
-
-        <button
-          className={"button blue"}
-          onClick={async () => {
-            const meetingId = prompt(
-              `Please enter meeting id where you want Connect`
-            );
-            if (meetingId) {
-              try {
-                await connectTo({
-                  meetingId,
-                  payload: "This is Testing Payload",
-                });
-              } catch (e) {
-                console.log("Connect to Error", e);
-              }
-            } else {
-              alert("Empty meetingId!");
-            }
-          }}
-        >
-          Make Connections
-        </button>
-      </div>
-      <h1>Meeting id is : {meetingId}</h1>
-      <div style={{ display: "flex", flex: 1 }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            flex: 1,
-            overflowY: "scroll",
-            height: `calc(100vh - ${tollbarHeight}px)`,
-          }}
-        >
-          <ExternalVideo />
-          {/* <ParticipantsView /> */}
-          {participantViewVisible ? <ParticipantsView /> : <ConnectionsView />}
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: theme.palette.background.default,
+          height: "100%",
+        }}
+      >
+        <Typography variant="h3" style={{ color: "#706694" }}>
+          Meeting ID: {meetingId}
+        </Typography>
+        <div style={{ display: "flex", flex: 1 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              position: "relative",
+              flex: 1,
+              overflowY: "scroll",
+              height: `calc(100vh - ${tollbarHeight}px)`,
+            }}
+          >
+            <ExternalVideo />
+            {/* <ParticipantsView /> */}
+            {participantViewVisible ? (
+              <ParticipantsView />
+            ) : (
+              <ConnectionsView />
+            )}
+          </div>
+          <MeetingChat tollbarHeight={tollbarHeight} />
         </div>
-        <MeetingChat tollbarHeight={tollbarHeight} />
+        <Paper
+          sx={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            overflow: "hidden",
+          }}
+          elevation={3}
+        >
+          <BottomNavigation
+            showLabels
+            value={value}
+            onChange={(event, newValue) => {
+              setValue(newValue);
+            }}
+          >
+            <BottomNavigationAction
+              label="Mic"
+              icon={<MicIcon />}
+              onClick={toggleMic}
+            />
+            <BottomNavigationAction
+              label="Webcam"
+              icon={<PhotoCameraIcon />}
+              onClick={() => toggleWebcam()}
+            />
+            <BottomNavigationAction
+              label="ScreenShare"
+              icon={<ScreenShareIcon color="success" />}
+              onClick={toggleScreenShare}
+            />
+            <BottomNavigationAction
+              label="Start Recording"
+              icon={<RadioButtonCheckedIcon />}
+              onClick={handleStartRecording}
+            />
+            <BottomNavigationAction
+              label="Stop Recording"
+              icon={<StopIcon />}
+              onClick={handleStopRecording}
+            />
+            <BottomNavigationAction
+              label="End Call"
+              icon={<CallEndIcon color="error" />}
+              onClick={confirmLeave}
+            />
+          </BottomNavigation>
+        </Paper>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -941,7 +873,7 @@ const App = () => {
     <JoiningScreen
       participantName={participantName}
       setParticipantName={setParticipantName}
-      meetinId={meetingId}
+      meetingId={meetingId}
       setMeetingId={setMeetingId}
       setToken={setToken}
       setMicOn={setMicOn}
